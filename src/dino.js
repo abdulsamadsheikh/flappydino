@@ -8,6 +8,8 @@ class Dino {
         this.jumpStrength = -10;
         this.velocity = 0;
         this.lasers = [];  // Store active lasers
+        this.image = new Image(); // Create a new Image object
+        this.image.src = 'assets/images/dino.png'; // Make sure the path is correct
     }
 
     jump() {
@@ -15,16 +17,12 @@ class Dino {
     }
 
     shootLaser() {
-        // Get a random laser image from the 66 available options
         const randomLaserImage = `assets/images/lasers/${this.getRandomLaserImage()}`;
-        
-        // Add new laser to the lasers array
         this.lasers.push(new Laser(this.x, this.y, randomLaserImage));
     }
 
     getRandomLaserImage() {
-        // Generate a random number between 1 and 66 for the laser image
-        const laserIndex = Math.floor(Math.random() * 66) + 1; // Range: 1 to 66
+        const laserIndex = Math.floor(Math.random() * 66) + 1; 
         return laserIndex < 10 ? `0${laserIndex}.png` : `${laserIndex}.png`;
     }
 
@@ -36,7 +34,7 @@ class Dino {
         // Ensure Dino stays within canvas bounds
         if (this.y + this.height > canvas.height) {
             this.y = canvas.height - this.height;
-            this.velocity = 0; // Stop falling once it hits the ground
+            this.velocity = 0;
         }
 
         // Update lasers
@@ -44,8 +42,8 @@ class Dino {
     }
 
     draw() {
-        // Draw dino on canvas (Replace this with image drawing logic if needed)
-        context.fillRect(this.x, this.y, this.width, this.height);
+        // Draw the Dino using the sprite image instead of a block
+        context.drawImage(this.image, this.x, this.y, this.width, this.height);
 
         // Draw lasers
         this.lasers.forEach(laser => laser.draw());
