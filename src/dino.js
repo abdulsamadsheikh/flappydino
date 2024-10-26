@@ -54,8 +54,8 @@ class Laser {
     constructor(x, y, imageSrc) {
         this.x = x;
         this.y = y;
-        this.width = 10;
-        this.height = 5;
+        this.width = 100;
+        this.height = 100;
         this.speed = 10;
         this.image = new Image();
         this.image.src = imageSrc;
