@@ -1,3 +1,5 @@
+// Contents of src/pipes.js
+
 class Tree {
     constructor() {
         this.x = canvas.width;
@@ -22,10 +24,9 @@ class Tree {
             this.direction *= -1;
         }
 
-        // If tree moves off-screen, reset its position
+        // Remove tree if it moves off-screen
         if (this.x + this.width < 0) {
-            this.x = canvas.width;
-            this.y = Math.random() * (canvas.height - 200) + 100; // Reset to random height
+            removeFromArray(obstacles, this);
         }
     }
 
@@ -50,10 +51,9 @@ class Pterodactyl {
         // Move pterodactyl to the left
         this.x -= this.speed;
 
-        // If pterodactyl moves off-screen, reset its position
+        // Remove pterodactyl if it moves off-screen
         if (this.x + this.width < 0) {
-            this.x = canvas.width;
-            this.y = Math.random() * (canvas.height - 100); // Reset to random height
+            removeFromArray(pterodactyls, this);
         }
     }
 
@@ -78,10 +78,9 @@ class Meteor {
         // Meteor falls from the top of the canvas
         this.y += this.speed;
 
-        // If meteor moves off-screen, reset its position
+        // Remove meteor if it moves off-screen
         if (this.y > canvas.height) {
-            this.x = Math.random() * (canvas.width - 50); // Reset to random horizontal position
-            this.y = -50; // Reset above the canvas
+            removeFromArray(meteors, this);
         }
     }
 

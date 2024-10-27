@@ -1,4 +1,6 @@
-// Detect collision between Dino and an obstacle (tree, pterodactyl, or meteor)
+// Contents of src/utils.js
+
+// Detect collision between Dino and an obstacle
 function detectCollision(dino, obstacle) {
     return (
         dino.x < obstacle.x + obstacle.width &&
@@ -8,15 +10,29 @@ function detectCollision(dino, obstacle) {
     );
 }
 
-// Handle user input for jumping and shooting
+// Handle user input for jumping, shooting, and game state transitions
 function handleInput(e) {
-    if (e.key === ' ') {
-        // Spacebar pressed for jumping
-        dino.jump();
-    }
-    if (e.key === 'ArrowRight') {
-        // Right arrow pressed for shooting lasers
-        dino.shootLaser();
+    if (gameState === 'start') {
+        if (e.key === ' ') {
+            // Start the game
+            gameState = 'playing';
+            startGame();
+        }
+    } else if (gameState === 'playing') {
+        if (e.key === ' ') {
+            // Spacebar pressed for jumping
+            dino.jump();
+        }
+        if (e.key === 'ArrowRight') {
+            // Right arrow pressed for shooting lasers
+            dino.shootLaser();
+        }
+    } else if (gameState === 'gameover') {
+        if (e.key === ' ') {
+            // Restart the game
+            resetGame();
+            gameState = 'playing';
+        }
     }
 }
 
@@ -28,7 +44,7 @@ function removeFromArray(array, element) {
     }
 }
 
-// Function to detect if a laser has hit an enemy (pterodactyl or meteor)
+// Function to detect if a laser has hit an enemy
 function detectLaserCollision(laser, enemy) {
     return (
         laser.x < enemy.x + enemy.width &&
@@ -38,7 +54,7 @@ function detectLaserCollision(laser, enemy) {
     );
 }
 
-// Detect multiple collisions between lasers and enemies
+// Detect collisions between lasers and enemies
 function detectLaserEnemyCollision(lasers, enemies) {
     lasers.forEach((laser) => {
         enemies.forEach((enemy) => {
@@ -46,12 +62,13 @@ function detectLaserEnemyCollision(lasers, enemies) {
                 console.log('Laser hit an enemy!');
                 removeFromArray(enemies, enemy); // Remove enemy
                 removeFromArray(lasers, laser);  // Remove laser
+                score += 10; // Increase score
             }
         });
     });
 }
 
-// Detect Dino's collision with any obstacles (trees, meteors, pterodactyls)
+// Detect Dino's collision with any obstacles
 function detectDinoCollision(dino, obstacles, meteors, pterodactyls) {
     obstacles.forEach((obstacle) => {
         if (detectCollision(dino, obstacle)) {
@@ -75,12 +92,11 @@ function detectDinoCollision(dino, obstacles, meteors, pterodactyls) {
     });
 }
 
-// Utility to end the game when Dino hits an obstacle
+// Function to end the game
 function endGame() {
     console.log('Game Over!');
-    isGameOver = true;  // Set a flag to stop the game loop
-    // Additional logic for game over can be added here (e.g., show a "Game Over" screen)
+    gameState = 'gameover'; // Set gameState to 'gameover'
 }
 
-// Event listener for keyboard input (jump and shoot)
+// Event listener for keyboard input
 window.addEventListener('keydown', handleInput);

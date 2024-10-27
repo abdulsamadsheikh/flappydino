@@ -1,3 +1,5 @@
+// Contents of src/dino.js
+
 class Dino {
     constructor() {
         this.x = 50;  // Position on canvas
@@ -64,6 +66,11 @@ class Laser {
     update() {
         // Move the laser to the right
         this.x += this.speed;
+
+        // Remove laser if it moves off-screen
+        if (this.x > canvas.width) {
+            removeFromArray(dino.lasers, this);
+        }
     }
 
     draw() {

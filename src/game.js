@@ -1,4 +1,4 @@
-// Initialize game elements like Dino, Obstacles, and Meteors
+// Initialize canvas and context
 let canvas = document.getElementById('gameCanvas');
 let context = canvas.getContext('2d');
 
@@ -22,7 +22,7 @@ backgroundLayer2.src = 'assets/images/background_layer_2.png';
 let backgroundLayer3 = new Image();
 backgroundLayer3.src = 'assets/images/background_layer_3.png'; // Optional, third layer
 
-// Variables to control the scrolling speed of each layer (slowed down by 3x)
+// Variables to control the scrolling speed of each layer
 let backgroundLayer1X = 0;
 let backgroundLayer2X = 0;
 let backgroundLayer3X = 0;
@@ -31,32 +31,57 @@ let backgroundSpeed1 = 0.5 / 3;  // Slow down background movement
 let backgroundSpeed2 = 1 / 3;
 let backgroundSpeed3 = 2.5 / 3;
 
-// Create the Dino and obstacles
+// Game state variables
+let gameState = 'start'; // Possible states: 'start', 'playing', 'gameover'
+let score = 0;
+let scoreTimer = 0;
+
+// Initialize game elements
 let dino;
 let obstacles = [];
 let meteors = [];
 let pterodactyls = [];
 
-// Flag to check if the game is over
-let isGameOver = false;
+// Timers for spawning obstacles
+let obstacleSpawnTimer = 0;
+let meteorSpawnTimer = 0;
+let pterodactylSpawnTimer = 0;
+
+// Start the game loop
+requestAnimationFrame(gameLoop);
 
 function startGame() {
-    // Initialize Dino
+    // Initialize game elements
     dino = new Dino();
-    
-    // Initialize obstacles (trees)
-    obstacles.push(new Tree());
+    obstacles = [new Tree()];
+    meteors = [new Meteor()];
+    pterodactyls = [new Pterodactyl()];
 
-    // Initialize meteors and pterodactyls
-    meteors.push(new Meteor());
-    pterodactyls.push(new Pterodactyl());
+    // Reset score and timers
+    score = 0;
+    scoreTimer = 0;
+    obstacleSpawnTimer = 0;
+    meteorSpawnTimer = 0;
+    pterodactylSpawnTimer = 0;
+}
 
-    // Start game loop
-    requestAnimationFrame(gameLoop);
+function resetGame() {
+    // Re-initialize game elements
+    dino = new Dino();
+    obstacles = [new Tree()];
+    meteors = [new Meteor()];
+    pterodactyls = [new Pterodactyl()];
+
+    // Reset score and timers
+    score = 0;
+    scoreTimer = 0;
+    obstacleSpawnTimer = 0;
+    meteorSpawnTimer = 0;
+    pterodactylSpawnTimer = 0;
 }
 
 function updateBackground() {
-    // Update background positions (slowed down by the speed variables)
+    // Update background positions
     backgroundLayer1X -= backgroundSpeed1;
     backgroundLayer2X -= backgroundSpeed2;
     backgroundLayer3X -= backgroundSpeed3;
@@ -74,77 +99,130 @@ function updateBackground() {
 }
 
 function drawBackground() {
-    // Draw the distant background (Layer 1)
+    // Draw background layers
     context.drawImage(backgroundLayer1, backgroundLayer1X, 0, canvas.width, canvas.height);
-    context.drawImage(backgroundLayer1, backgroundLayer1X + canvas.width, 0, canvas.width, canvas.height); // Loop
+    context.drawImage(backgroundLayer1, backgroundLayer1X + canvas.width, 0, canvas.width, canvas.height);
 
-    // Draw the midground background (Layer 2)
     context.drawImage(backgroundLayer2, backgroundLayer2X, 0, canvas.width, canvas.height);
-    context.drawImage(backgroundLayer2, backgroundLayer2X + canvas.width, 0, canvas.width, canvas.height); // Loop
+    context.drawImage(backgroundLayer2, backgroundLayer2X + canvas.width, 0, canvas.width, canvas.height);
 
-    // Draw the foreground background (Layer 3)
     context.drawImage(backgroundLayer3, backgroundLayer3X, 0, canvas.width, canvas.height);
-    context.drawImage(backgroundLayer3, backgroundLayer3X + canvas.width, 0, canvas.width, canvas.height); // Loop
+    context.drawImage(backgroundLayer3, backgroundLayer3X + canvas.width, 0, canvas.width, canvas.height);
 }
 
 function gameLoop() {
-    // Stop the game loop if game is over
-    if (isGameOver) {
-        return;
-    }
-
     // Clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Update background
-    updateBackground();
+    if (gameState === 'start') {
+        // Draw start screen
+        drawStartScreen();
+    } else if (gameState === 'playing') {
+        // Update game elements
+        updateBackground();
+        drawBackground();
 
-    // Draw background
-    drawBackground();
+        dino.update();
+        dino.draw();
 
-    // Update and draw dino
-    dino.update();
-    dino.draw();
+        // Update and draw obstacles
+        obstacles.forEach(tree => {
+            tree.update();
+            tree.draw();
+        });
 
-    // Update and draw obstacles (trees)
-    obstacles.forEach(tree => {
-        tree.update();
-        tree.draw();
-    });
+        meteors.forEach(meteor => {
+            meteor.update();
+            meteor.draw();
+        });
 
-    // Update and draw meteors
-    meteors.forEach(meteor => {
-        meteor.update();
-        meteor.draw();
-    });
+        pterodactyls.forEach(pterodactyl => {
+            pterodactyl.update();
+            pterodactyl.draw();
+        });
 
-    // Update and draw pterodactyls
-    pterodactyls.forEach(pterodactyl => {
-        pterodactyl.update();
-        pterodactyl.draw();
-    });
+        // Update score
+        updateScore();
+        drawScore();
 
-    // Check for collisions
-    checkCollisions();
+        // Spawn new obstacles
+        spawnObstacles();
+
+        // Check for collisions
+        checkCollisions();
+    } else if (gameState === 'gameover') {
+        // Draw game over screen
+        drawGameOverScreen();
+    }
 
     // Request the next frame
     requestAnimationFrame(gameLoop);
 }
 
+function drawStartScreen() {
+    context.fillStyle = 'black';
+    context.font = '48px Arial';
+    context.textAlign = 'center';
+    context.fillText('Flappy Dino', canvas.width / 2, canvas.height / 2 - 50);
+    context.font = '24px Arial';
+    context.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2);
+}
+
+function drawGameOverScreen() {
+    context.fillStyle = 'black';
+    context.font = '48px Arial';
+    context.textAlign = 'center';
+    context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 50);
+    context.font = '24px Arial';
+    context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
+    context.fillText('Press Space to Restart', canvas.width / 2, canvas.height / 2 + 50);
+}
+
+function updateScore() {
+    // Increase score over time
+    scoreTimer++;
+    if (scoreTimer % 60 === 0) { // Assuming 60 FPS
+        score += 1;
+    }
+}
+
+function drawScore() {
+    context.fillStyle = 'black';
+    context.font = '24px Arial';
+    context.textAlign = 'left';
+    context.fillText(`Score: ${score}`, 20, 30);
+}
+
+function spawnObstacles() {
+    // Increase timers
+    obstacleSpawnTimer++;
+    meteorSpawnTimer++;
+    pterodactylSpawnTimer++;
+
+    // Spawn new tree every 200 frames (~every 3 seconds at 60fps)
+    if (obstacleSpawnTimer > 200) {
+        obstacles.push(new Tree());
+        obstacleSpawnTimer = 0;
+    }
+
+    // Spawn new meteor every 150 frames
+    if (meteorSpawnTimer > 150) {
+        meteors.push(new Meteor());
+        meteorSpawnTimer = 0;
+    }
+
+    // Spawn new pterodactyl every 250 frames
+    if (pterodactylSpawnTimer > 250) {
+        pterodactyls.push(new Pterodactyl());
+        pterodactylSpawnTimer = 0;
+    }
+}
+
 function checkCollisions() {
-    // Check collisions between Dino and obstacles (trees, meteors, pterodactyls)
+    // Check collisions between Dino and obstacles
     detectDinoCollision(dino, obstacles, meteors, pterodactyls);
 
     // Check if lasers hit meteors or pterodactyls
     detectLaserEnemyCollision(dino.lasers, meteors);
     detectLaserEnemyCollision(dino.lasers, pterodactyls);
 }
-
-function endGame() {
-    console.log('Game Over');
-    isGameOver = true; // Stop the game loop
-    // Additional logic for game over (e.g., showing Game Over screen) can be added here
-}
-
-// Start the game
-startGame();
