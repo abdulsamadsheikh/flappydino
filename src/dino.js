@@ -32,16 +32,18 @@ class Dino {
         // Apply gravity
         this.velocity += this.gravity;
         this.y += this.velocity;
-
+    
         // Ensure Dino stays within canvas bounds
         if (this.y + this.height > canvas.height) {
             this.y = canvas.height - this.height;
             this.velocity = 0;
+            endGame();  // Trigger game over if the Dino hits the ground
         }
-
+    
         // Update lasers
         this.lasers.forEach(laser => laser.update());
     }
+    
 
     draw() {
         // Draw the Dino using the sprite image instead of a block

@@ -65,22 +65,24 @@ class Pterodactyl {
 
 class Meteor {
     constructor() {
-        this.x = Math.random() * (canvas.width - 50); // Random horizontal position
-        this.y = -50; // Start above the canvas
+        this.x = canvas.width;                 // Start from the right side of the canvas
+        this.y = -50;                           // Start above the canvas
         this.width = 30;
         this.height = 30;
-        this.speed = 7;
+        this.speedY = 7;                        // Vertical speed (falling downwards)
+        this.speedX = -10;                       // Horizontal speed (moving leftward)
         this.image = new Image();
         this.image.src = 'assets/images/meteor.png'; // Meteor image
     }
 
     update() {
-        // Meteor falls from the top of the canvas
-        this.y += this.speed;
+        // Move the meteor diagonally by adjusting both x and y coordinates
+        this.y += this.speedY;
+        this.x += this.speedX;
 
-        // Remove meteor if it moves off-screen
-        if (this.y > canvas.height) {
-            removeFromArray(meteors, this);
+        // Remove meteor if it moves off-screen to the left or goes below the screen
+        if (this.y > canvas.height || this.x + this.width < 0) {
+            removeFromArray(meteors, this);     // Remove meteor from the array when it's off-screen
         }
     }
 

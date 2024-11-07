@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om Oss - Flappy Dino</title>
+    <link rel="stylesheet" href="styles/about.css">
+</head>
+<body>
+    <header>
+        <h1>Om Oss</h1>
+        <p>Velkommen til Flappy Dino! Vi er en gruppe utviklere fra NTNU som har laget dette spillet.</p>
+        <a href="index.html">Tilbake til spillet</a>
+    </header>
+
+    <section id="team">
+        <h2>Utviklerteam</h2>
+        <ul>
+            <li>Abdulsamad Sheikh - Teamleder og ansvarlig for kvalitetssikring</li>
+            <li>Bilal Rasulovich Mataev - Ansvarlig for møteorganisering og oppsett av utviklingsmiljø</li>
+            <li>Samad Ismayilov - Ansvarlig for dokumentasjon og brukergrensesnitt</li>
+            <li>Mnohar Sheikh Ali - Ansvarlig for idéutvikling og kreativ problemløsning</li>
+        </ul>
+    </section>
+
+    <section id="rules">
+        <h2>Regler for Spillet</h2>
+        <p>I Flappy Dino styrer du en dinosaur som må unngå hindringer ved å hoppe og skyte lasere. Målet er å overleve så lenge som mulig og oppnå en høy poengsum.</p>
+    </section>
+
+    <section id="faq">
+        <h2>Ofte Stilte Spørsmål (FAQ)</h2>
+        <h3>Hvordan kontrollerer jeg dinosauren?</h3>
+        <p>Bruk sapce for å hoppe og høyre piltast for å skyte lasere.</p>
+
+        <h3>Hva skjer hvis dinosauren treffer en hindring?</h3>
+        <p>Dinosauren taper spillet hvis den treffer en hindring eller faller i bakken.</p>
+    </section>
+
+    <section id="requirements">
+        <h2>Krav til Plattform</h2>
+        <p>Spillet fungerer best i de nyeste versjonene av Chrome, Firefox og Safari, både på PC og mobile enheter. Sørg for å ha JavaScript aktivert i nettleseren.</p>
+    </section>
+
+    <section id="contact">
+        <h2>Kontakt Oss</h2>
+        <form action="submit_form.php" method="post">
+            <label for="name">Navn:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">E-post:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="message">Melding:</label>
+            <textarea id="message" name="message" required></textarea>
+
+            <button type="submit">Send Melding</button>
+        </form>
+    </section>
+</body>
+</html>

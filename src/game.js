@@ -34,7 +34,6 @@ let backgroundSpeed3 = 2.5 / 3;
 // Game state variables
 let gameState = 'start'; // Possible states: 'start', 'playing', 'gameover'
 let score = 0;
-let scoreTimer = 0;
 
 // Initialize game elements
 let dino;
@@ -59,25 +58,14 @@ function startGame() {
 
     // Reset score and timers
     score = 0;
-    scoreTimer = 0;
     obstacleSpawnTimer = 0;
     meteorSpawnTimer = 0;
     pterodactylSpawnTimer = 0;
 }
 
 function resetGame() {
-    // Re-initialize game elements
-    dino = new Dino();
-    obstacles = [new Tree()];
-    meteors = [new Meteor()];
-    pterodactyls = [new Pterodactyl()];
-
-    // Reset score and timers
-    score = 0;
-    scoreTimer = 0;
-    obstacleSpawnTimer = 0;
-    meteorSpawnTimer = 0;
-    pterodactylSpawnTimer = 0;
+    startGame(); // Reuse startGame to reset
+    gameState = 'playing';
 }
 
 function updateBackground() {
@@ -141,15 +129,17 @@ function gameLoop() {
             pterodactyl.draw();
         });
 
-        // Update score
-        updateScore();
-        drawScore();
-
         // Spawn new obstacles
         spawnObstacles();
 
         // Check for collisions
         checkCollisions();
+
+        // Update score
+        score++;
+        
+        // Draw live score
+        drawScore();
     } else if (gameState === 'gameover') {
         // Draw game over screen
         drawGameOverScreen();
@@ -176,14 +166,6 @@ function drawGameOverScreen() {
     context.font = '24px Arial';
     context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
     context.fillText('Press Space to Restart', canvas.width / 2, canvas.height / 2 + 50);
-}
-
-function updateScore() {
-    // Increase score over time
-    scoreTimer++;
-    if (scoreTimer % 60 === 0) { // Assuming 60 FPS
-        score += 1;
-    }
 }
 
 function drawScore() {
