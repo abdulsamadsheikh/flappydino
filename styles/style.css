@@ -5,6 +5,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     background-color: lightblue;
 }
 
@@ -31,12 +33,21 @@ body {
     text-decoration: underline;
 }
 
+/* Game Container to Center the Canvas */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    margin-top: 60px; /* Space for navbar */
+    height: calc(100vh - 60px); /* Ensures it centers within the viewport */
+}
+
 /* Game Canvas */
 canvas {
     border: 2px solid black;
     width: 800px;
     height: 600px;
-    margin-top: 70px; /* Adjust for navbar height */
 }
 
 /* Title Card */

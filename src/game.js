@@ -1,6 +1,7 @@
 // Initialize canvas and context
 let canvas = document.getElementById('gameCanvas');
 let context = canvas.getContext('2d');
+let highScore = localStorage.getItem('highScore') || 0;  // Load high score from localStorage or default to 0
 
 // Function to make canvas full screen
 function resizeCanvas() {
@@ -57,15 +58,16 @@ function startGame() {
     pterodactyls = [new Pterodactyl()];
 
     // Reset score and timers
-    score = 0;
+    score = -1;
     obstacleSpawnTimer = 0;
     meteorSpawnTimer = 0;
     pterodactylSpawnTimer = 0;
+    
+    gameState = 'playing'; // Set game state to playing
 }
 
 function resetGame() {
     startGame(); // Reuse startGame to reset
-    gameState = 'playing';
 }
 
 function updateBackground() {
@@ -103,7 +105,6 @@ function gameLoop() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     if (gameState === 'start') {
-        // Draw start screen
         drawStartScreen();
     } else if (gameState === 'playing') {
         // Update game elements
@@ -141,8 +142,7 @@ function gameLoop() {
         // Draw live score
         drawScore();
     } else if (gameState === 'gameover') {
-        // Draw game over screen
-        drawGameOverScreen();
+        drawGameOverScreen(); // Show game over screen with high score
     }
 
     // Request the next frame
@@ -165,14 +165,15 @@ function drawGameOverScreen() {
     context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 50);
     context.font = '24px Arial';
     context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
-    context.fillText('Press Space to Restart', canvas.width / 2, canvas.height / 2 + 50);
+    context.fillText(`High Score: ${highScore}`, canvas.width / 2, canvas.height / 2 + 50); // Display high score
+    context.fillText('Press Space to Restart', canvas.width / 2, canvas.height / 2 + 100);
 }
 
 function drawScore() {
-    context.fillStyle = 'black';
-    context.font = '24px Arial';
-    context.textAlign = 'left';
-    context.fillText(`Score: ${score}`, 20, 30);
+    context.fillStyle = 'white';               
+    context.font = '36px Arial';               
+    context.textAlign = 'center';             
+    context.fillText(`Score: ${score}`, canvas.width / 2, 50); 
 }
 
 function spawnObstacles() {
@@ -207,4 +208,35 @@ function checkCollisions() {
     // Check if lasers hit meteors or pterodactyls
     detectLaserEnemyCollision(dino.lasers, meteors);
     detectLaserEnemyCollision(dino.lasers, pterodactyls);
+}
+
+function endGame() {
+    console.log('Game Over!');
+    gameState = 'gameover';
+
+    // Check if the current score is higher than the saved high score
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);  // Save the new high score to localStorage
+        console.log('New high score:', highScore);
+    }
+}
+
+// Event listener for handling user input
+window.addEventListener('keydown', handleInput);
+
+function handleInput(e) {
+    if (gameState === 'start') {
+        if (e.key === ' ') {
+            startGame();
+        }
+    } else if (gameState === 'playing') {
+        if (e.key === ' ') {
+            dino.jump();       // Make the Dino jump
+        }
+    } else if (gameState === 'gameover') {
+        if (e.key === ' ') {
+            startGame();       // Restart the game
+        }
+    }
 }
