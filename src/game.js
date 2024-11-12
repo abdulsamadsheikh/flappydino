@@ -58,7 +58,7 @@ function startGame() {
     pterodactyls = [new Pterodactyl()];
 
     // Reset score and timers
-    score = -1;
+    score = 0;
     obstacleSpawnTimer = 0;
     meteorSpawnTimer = 0;
     pterodactylSpawnTimer = 0;
@@ -136,9 +136,11 @@ function gameLoop() {
         // Check for collisions
         checkCollisions();
 
-        // Update score
-        score++;
-        
+        // Increment score only if game is still in 'playing' state
+        if (gameState === 'playing') {
+            score++;
+        }
+
         // Draw live score
         drawScore();
     } else if (gameState === 'gameover') {
@@ -214,10 +216,9 @@ function endGame() {
     console.log('Game Over!');
     gameState = 'gameover';
 
-    // Check if the current score is higher than the saved high score
     if (score > highScore) {
         highScore = score;
-        localStorage.setItem('highScore', highScore);  // Save the new high score to localStorage
+        localStorage.setItem('highScore', highScore);  
         console.log('New high score:', highScore);
     }
 }
