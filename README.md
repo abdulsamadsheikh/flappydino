@@ -42,6 +42,22 @@ Flappy Dino er et webspill der spilleren styrer en dinosaur gjennom et forhistor
 3. **Unngå hindringer**: Unngå kollisjoner med trær, meteorer og pterodactyler.
 4. **Mål**: Overlev lengst mulig for å oppnå en høy poengsum.
 
+## Kilder og inspirasjon
+
+For å spare tid og fokusere på spillutviklingen brukte vi åpen kildekode og grafikk fra følgende kilder på OpenGameArt:
+
+### Grafikk
+- **Bakgrunn**: [Forest Parallax](https://opengameart.org/content/forest-parallax)
+- **Hindringer og karakterer**:
+  - [Dead Tree (Yars Tree Rework)](https://opengameart.org/content/dead-tree-yars-tree-rework)
+  - [2D Dinosaur Set](https://opengameart.org/content/2d-dinosaur-set)
+  - [Meteor](https://opengameart.org/content/meteor-0)
+
+### Lydeffekter
+- **8-Bit Sound Effects Library**: [OpenGameArt](https://opengameart.org/content/8-bit-sound-effects-library)
+
+Alle elementene brukt fra OpenGameArt er lisensiert under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/), noe som betyr at de er i offentlig eiendom og fritt tilgjengelig for bruk.
+
 ## Risiko og kvalitetskontroll
 
 For å sikre gjennomføring og kvalitet på prosjektet har vi gjennomført en **risikovurdering** og implementert flere kvalitetskontroller. Dette omfatter regelmessig testing, kodegjennomgang og brukertesting for å oppdage og løse feil tidlig.
