@@ -16,11 +16,17 @@ class Dino {
 
     jump() {
         this.velocity = this.jumpStrength; // Makes the dino jump
+
+        // Play a random jump sound with specified volume
+        playRandomSound(jumpSounds, JUMPING_SOUNDS_VOLUME);
     }
 
     shootLaser() {
         const randomLaserImage = `assets/images/lasers/${this.getRandomLaserImage()}`;
         this.lasers.push(new Laser(this.x, this.y, randomLaserImage));
+
+        // Play a random shoot sound with specified volume
+        playRandomSound(shootSounds, SHOOTING_SOUNDS_VOLUME);
     }
 
     getRandomLaserImage() {
@@ -43,7 +49,7 @@ class Dino {
         // Update lasers
         this.lasers.forEach(laser => laser.update());
     }
-    
+
 
     draw() {
         // Draw the Dino using the sprite image instead of a block

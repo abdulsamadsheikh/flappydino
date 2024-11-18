@@ -63,6 +63,9 @@ function detectLaserEnemyCollision(lasers, enemies) {
                 removeFromArray(enemies, enemy); // Remove enemy
                 removeFromArray(lasers, laser);  // Remove laser
                 score += 10; // Increase score
+
+                // Play a random hit sound with specified volume
+                playRandomSound(hitSounds, COLLISION_SOUNDS_VOLUME);
             }
         });
     });
@@ -73,6 +76,10 @@ function detectDinoCollision(dino, obstacles, meteors, pterodactyls) {
     obstacles.forEach((obstacle) => {
         if (detectCollision(dino, obstacle)) {
             console.log('Dino hit a tree!');
+
+            // Play a random hit sound with specified volume
+            playRandomSound(hitSounds, COLLISION_SOUNDS_VOLUME);
+
             endGame();
         }
     });
@@ -80,6 +87,10 @@ function detectDinoCollision(dino, obstacles, meteors, pterodactyls) {
     meteors.forEach((meteor) => {
         if (detectCollision(dino, meteor)) {
             console.log('Dino hit a meteor!');
+
+            // Play a random hit sound with specified volume
+            playRandomSound(hitSounds, COLLISION_SOUNDS_VOLUME);
+
             endGame();
         }
     });
@@ -87,6 +98,10 @@ function detectDinoCollision(dino, obstacles, meteors, pterodactyls) {
     pterodactyls.forEach((pterodactyl) => {
         if (detectCollision(dino, pterodactyl)) {
             console.log('Dino hit a pterodactyl!');
+
+            // Play a random hit sound with specified volume
+            playRandomSound(hitSounds, COLLISION_SOUNDS_VOLUME);
+
             endGame();
         }
     });
@@ -95,8 +110,13 @@ function detectDinoCollision(dino, obstacles, meteors, pterodactyls) {
 // Function to end the game
 function endGame() {
     console.log('Game Over!');
-    gameState = 'gameover'; // Set gameState to 'gameover'
-}
+    gameState = 'gameover';
 
-// Event listener for keyboard input
-window.addEventListener('keydown', handleInput);
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);  
+        console.log('New high score:', highScore);
+    }
+
+    // Do NOT pause the background music to keep it playing continuously
+}

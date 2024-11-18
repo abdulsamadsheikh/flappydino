@@ -36,16 +36,65 @@ let backgroundSpeed3 = 2.5 / 3;
 let gameState = 'start'; // Possible states: 'start', 'playing', 'gameover'
 let score = 0;
 
-// Initialize game elements
-let dino;
-let obstacles = [];
-let meteors = [];
-let pterodactyls = [];
+// Volume Levels
+const BACKGROUND_MUSIC_VOLUME = 0.8; // Background music volume (0.0 to 1.0)
+const COLLISION_SOUNDS_VOLUME = 0.5;  // Collision sounds volume
+const SHOOTING_SOUNDS_VOLUME = 0.4;   // Shooting sounds volume
+const JUMPING_SOUNDS_VOLUME = 0.3;    // Jumping sounds volume
 
-// Timers for spawning obstacles
-let obstacleSpawnTimer = 0;
-let meteorSpawnTimer = 0;
-let pterodactylSpawnTimer = 0;
+// Initialize Audio for background music
+const backgroundMusic = new Audio('assets/sounds/background_music.mp3');
+backgroundMusic.loop = true; // Ensure the music loops
+backgroundMusic.volume = BACKGROUND_MUSIC_VOLUME; // Set higher volume
+backgroundMusic.preload = 'auto'; // Preload the music
+
+// Initialize Sound Effects with Multiple Variations
+const hitSounds = [
+    new Audio('assets/sounds/Hit_00.mp3'),
+    new Audio('assets/sounds/Hit_01.mp3'),
+    new Audio('assets/sounds/Hit_02.mp3'),
+    new Audio('assets/sounds/Hit_03.mp3')
+];
+
+const jumpSounds = [
+    new Audio('assets/sounds/Jump_00.mp3'),
+    new Audio('assets/sounds/Jump_01.mp3'),
+    new Audio('assets/sounds/Jump_02.mp3'),
+    new Audio('assets/sounds/Jump_03.mp3')
+];
+
+const shootSounds = [
+    new Audio('assets/sounds/Shoot_00.mp3'),
+    new Audio('assets/sounds/Shoot_01.mp3'),
+    new Audio('assets/sounds/Shoot_02.mp3'),
+    new Audio('assets/sounds/Shoot_03.mp3')
+];
+
+// Function to play a random sound from an array with specified volume
+function playRandomSound(soundArray, volume) {
+    const randomIndex = Math.floor(Math.random() * soundArray.length);
+    const sound = soundArray[randomIndex].cloneNode(); // Clone to allow overlapping plays
+    sound.volume = volume; // Set the specified volume
+    sound.play().catch(error => {
+        console.error('Sound play failed:', error);
+    });
+}
+
+// Preload Sound Effects
+hitSounds.forEach(sound => {
+    sound.preload = 'auto';
+});
+
+jumpSounds.forEach(sound => {
+    sound.preload = 'auto';
+});
+
+shootSounds.forEach(sound => {
+    sound.preload = 'auto';
+});
+
+// Flag to ensure background music is played only once
+let isBackgroundMusicPlaying = false;
 
 // Start the game loop
 requestAnimationFrame(gameLoop);
@@ -64,6 +113,19 @@ function startGame() {
     pterodactylSpawnTimer = 0;
     
     gameState = 'playing'; // Set game state to playing
+
+    // Play background music if not already playing
+    if (!isBackgroundMusicPlaying) {
+        backgroundMusic.play().then(() => {
+            isBackgroundMusicPlaying = true;
+            console.log('Background music started.');
+        }).catch(error => {
+            console.error('Background music play failed:', error);
+        });
+    } else {
+        // If music is already playing, ensure it continues
+        console.log('Background music is already playing.');
+    }
 }
 
 function resetGame() {
@@ -221,23 +283,9 @@ function endGame() {
         localStorage.setItem('highScore', highScore);  
         console.log('New high score:', highScore);
     }
+
+    // Do NOT pause the background music to keep it playing continuously
 }
 
 // Event listener for handling user input
 window.addEventListener('keydown', handleInput);
-
-function handleInput(e) {
-    if (gameState === 'start') {
-        if (e.key === ' ') {
-            startGame();
-        }
-    } else if (gameState === 'playing') {
-        if (e.key === ' ') {
-            dino.jump();       // Make the Dino jump
-        }
-    } else if (gameState === 'gameover') {
-        if (e.key === ' ') {
-            startGame();       // Restart the game
-        }
-    }
-}
