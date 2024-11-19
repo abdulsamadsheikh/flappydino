@@ -38,9 +38,9 @@ let score = 0;
 
 // Volume Levels
 const BACKGROUND_MUSIC_VOLUME = 0.8; // Background music volume (0.0 to 1.0)
-const COLLISION_SOUNDS_VOLUME = 0.5;  // Collision sounds volume
-const SHOOTING_SOUNDS_VOLUME = 0.4;   // Shooting sounds volume
-const JUMPING_SOUNDS_VOLUME = 0.3;    // Jumping sounds volume
+const COLLISION_SOUNDS_VOLUME = 0.2;  // Collision sounds volume
+const SHOOTING_SOUNDS_VOLUME = 0.2;   // Shooting sounds volume
+const JUMPING_SOUNDS_VOLUME = 0.1;    // Jumping sounds volume
 
 // Initialize Audio for background music
 const backgroundMusic = new Audio('assets/sounds/background_music.mp3');
