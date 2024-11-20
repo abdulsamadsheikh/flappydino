@@ -1,23 +1,20 @@
-// Contents of src/dino.js
-
 class Dino {
     constructor() {
-        this.x = 50;  // Position on canvas
-        this.y = canvas.height / 2; // Start in middle
-        this.width = 50; // Dino size
+        this.x = 50;  
+        this.y = canvas.height / 2; 
+        this.width = 50;
         this.height = 50;
         this.gravity = 0.5;
         this.jumpStrength = -10;
         this.velocity = 0;
-        this.lasers = [];  // Store active lasers
-        this.image = new Image(); // Create a new Image object
-        this.image.src = 'assets/images/dino.png'; // Make sure the path is correct
+        this.lasers = [];  
+        this.image = new Image(); 
+        this.image.src = 'assets/images/dino.png'; 
     }
 
     jump() {
-        this.velocity = this.jumpStrength; // Makes the dino jump
+        this.velocity = this.jumpStrength;
 
-        // Play a random jump sound with specified volume
         playRandomSound(jumpSounds, JUMPING_SOUNDS_VOLUME);
     }
 
@@ -25,7 +22,6 @@ class Dino {
         const randomLaserImage = `assets/images/lasers/${this.getRandomLaserImage()}`;
         this.lasers.push(new Laser(this.x, this.y, randomLaserImage));
 
-        // Play a random shoot sound with specified volume
         playRandomSound(shootSounds, SHOOTING_SOUNDS_VOLUME);
     }
 
@@ -35,31 +31,27 @@ class Dino {
     }
 
     update() {
-        // Apply gravity
         this.velocity += this.gravity;
         this.y += this.velocity;
     
-        // Ensure Dino stays within canvas bounds
         if (this.y + this.height > canvas.height) {
             this.y = canvas.height - this.height;
             this.velocity = 0;
-            endGame(); // Trigger game over if the Dino hits the ground
+            endGame(); 
         }
     
-        // Prevent Dino from going above the canvas
         if (this.y < 0) {
-            this.y = 0; // Reset position to the top of the canvas
-            this.velocity = 0; // Stop upward movement
+            this.y = 0; 
+            this.velocity = 0; 
         }
     
-        // Update lasers
         this.lasers.forEach(laser => laser.update());
     }
     
 
 
     draw() {
-        // Draw the Dino using the sprite image instead of a block
+        // Draw the Dino using the sprite image
         context.drawImage(this.image, this.x, this.y, this.width, this.height);
 
         // Draw lasers
@@ -79,17 +71,14 @@ class Laser {
     }
 
     update() {
-        // Move the laser to the right
         this.x += this.speed;
 
-        // Remove laser if it moves off-screen
         if (this.x > canvas.width) {
             removeFromArray(dino.lasers, this);
         }
     }
 
     draw() {
-        // Draw the laser image on the canvas
         context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
