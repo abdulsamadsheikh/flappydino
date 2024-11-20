@@ -43,12 +43,19 @@ class Dino {
         if (this.y + this.height > canvas.height) {
             this.y = canvas.height - this.height;
             this.velocity = 0;
-            endGame();  // Trigger game over if the Dino hits the ground
+            endGame(); // Trigger game over if the Dino hits the ground
+        }
+    
+        // Prevent Dino from going above the canvas
+        if (this.y < 0) {
+            this.y = 0; // Reset position to the top of the canvas
+            this.velocity = 0; // Stop upward movement
         }
     
         // Update lasers
         this.lasers.forEach(laser => laser.update());
     }
+    
 
 
     draw() {

@@ -1,68 +1,117 @@
+/* General body styling */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #121212; /* Dark mode background */
+    color: #e0e0e0; /* Light text for better contrast */
     line-height: 1.6;
 }
 
+/* Header styling */
 header {
     text-align: center;
-    background: #333;
-    color: white;
+    background: #1f1f1f; /* Darker background for header */
+    color: #e0e0e0;
     padding: 20px;
+    border-bottom: 2px solid #333; /* Subtle border for separation */
 }
 
 header h1 {
     margin: 0;
+    font-size: 2.5rem; /* Larger, modern font size */
+    font-weight: bold;
 }
 
 header a {
-    color: #ee00ff;
+    color: #bb86fc; /* Accent color for links */
     text-decoration: none;
-    font-size: 18px;
+    font-size: 1.1rem;
+    transition: color 0.3s ease; /* Smooth hover transition */
 }
 
+header a:hover {
+    color: #ff79c6; /* Hover color for links */
+}
+
+/* Section container styling */
 section {
     max-width: 800px;
     margin: 20px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    background: #1f1f1f; /* Dark background for content */
+    border-radius: 10px; /* Softer rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6); /* Deeper shadow for modern look */
+    border: 1px solid #333; /* Subtle border for definition */
 }
 
+/* Section heading styling */
 section h2 {
-    color: #333;
+    color: #bb86fc; /* Accent color for headings */
     margin-top: 0;
+    font-size: 2rem; /* Larger heading font size */
+    border-bottom: 2px solid #333; /* Divider line under headings */
+    padding-bottom: 5px;
 }
 
+/* Form elements styling */
 form label {
     display: block;
-    margin-top: 10px;
+    margin-top: 15px;
     font-weight: bold;
+    font-size: 1.1rem;
 }
 
 form input, form textarea {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background-color: #222; /* Darker input background */
+    border: 1px solid #444; /* Subtle border for inputs */
     border-radius: 5px;
+    color: #e0e0e0; /* Light text for inputs */
+    font-size: 1rem;
+}
+
+form input::placeholder, form textarea::placeholder {
+    color: #777; /* Lighter placeholder text */
 }
 
 form button {
     display: inline-block;
-    padding: 10px 20px;
-    background-color: #333;
-    color: white;
+    padding: 12px 25px;
+    background-color: #bb86fc; /* Primary button color */
+    color: #121212; /* Dark text for button */
     border: none;
-    border-radius: 5px;
+    border-radius: 25px; /* Fully rounded button */
+    font-size: 1rem;
+    font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 form button:hover {
-    background-color: #555;
+    background-color: #ff79c6; /* Hover color for button */
+    transform: scale(1.05); /* Subtle scale effect */
+}
+
+/* Section responsiveness for smaller screens */
+@media (max-width: 600px) {
+    section {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header a {
+        font-size: 1rem;
+    }
+
+    section h2 {
+        font-size: 1.5rem;
+    }
 }
