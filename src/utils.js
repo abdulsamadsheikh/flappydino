@@ -7,6 +7,10 @@ function detectCollision(dino, obstacle) {
     );
 }
 
+let touchStartX = 0;
+let touchStartY = 0;
+let isSwiping = false;
+
 function handleInput(e) {
     if (gameState === 'start') {
         if (e.key === ' ' || e.type === 'touchstart') {
@@ -21,7 +25,7 @@ function handleInput(e) {
             if (e.key === ' ' || e.type === 'touchstart') {
                 dino.jump();
             }
-            if (e.key === 'ArrowRight' || e.type === 'touchstart' && e.touches[0].clientX > canvas.width / 2) {
+            if (e.key === 'ArrowRight') {
                 dino.shootLaser();
             }
         }
@@ -31,6 +35,36 @@ function handleInput(e) {
             gameState = 'playing';
         }
     }
+}
+
+function handleTouchStart(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    isSwiping = false;
+}
+
+function handleTouchMove(e) {
+    if (!isSwiping) {
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+
+        // If horizontal movement is greater than vertical and significant enough
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+            isSwiping = true;
+            if (deltaX > 0 && gameState === 'playing' && !isPaused) {
+                dino.shootLaser();
+            }
+        }
+    }
+}
+
+function handleTouchEnd(e) {
+    if (!isSwiping) {
+        handleInput({ type: 'touchstart' });
+    }
+    isSwiping = false;
 }
 
 function removeFromArray(array, element) {
@@ -109,4 +143,6 @@ function endGame() {
 }
 
 // Add touch event listeners for mobile
-canvas.addEventListener('touchstart', handleInput, { passive: true });
+canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
+canvas.addEventListener('touchend', handleTouchEnd, { passive: true });

@@ -232,8 +232,14 @@ function drawStartScreen() {
     
     // Draw instructions
     context.font = `${Math.min(20, canvas.width / 48)}px Arial`;
-    context.fillText('Press SPACE or tap to start', canvas.width / 2, canvas.height / 2 + 100);
-    context.fillText('SPACE to jump, RIGHT ARROW to shoot', canvas.width / 2, canvas.height / 2 + 130);
+    context.fillText('Tap to start', canvas.width / 2, canvas.height / 2 + 100);
+    
+    // Show different instructions for mobile and desktop
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        context.fillText('Tap to jump, swipe right to shoot', canvas.width / 2, canvas.height / 2 + 130);
+    } else {
+        context.fillText('SPACE to jump, RIGHT ARROW to shoot', canvas.width / 2, canvas.height / 2 + 130);
+    }
     context.fillText('P to pause', canvas.width / 2, canvas.height / 2 + 160);
 }
 
