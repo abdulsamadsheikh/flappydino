@@ -10,6 +10,13 @@ body {
     background-color: lightblue;
     overflow: hidden;
     touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Navigation Bar */
@@ -54,6 +61,14 @@ canvas {
     width: auto;
     height: auto;
     object-fit: contain;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Mobile-specific styles */

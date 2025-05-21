@@ -38,6 +38,7 @@ function handleInput(e) {
 }
 
 function handleTouchStart(e) {
+    e.preventDefault(); // Prevent default touch behavior
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     isSwiping = false;
@@ -55,6 +56,7 @@ function handleTouchStart(e) {
 }
 
 function handleTouchMove(e) {
+    e.preventDefault(); // Prevent default touch behavior
     if (!isSwiping) {
         const touchX = e.touches[0].clientX;
         const touchY = e.touches[0].clientY;
@@ -72,6 +74,7 @@ function handleTouchMove(e) {
 }
 
 function handleTouchEnd(e) {
+    e.preventDefault(); // Prevent default touch behavior
     isSwiping = false;
 }
 
@@ -150,7 +153,15 @@ function endGame() {
 
 }
 
-// Add touch event listeners for mobile
-canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
-canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
-canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
+// Initialize touch events
+function initializeTouchEvents() {
+    const canvas = document.getElementById('gameCanvas');
+    if (canvas) {
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    }
+}
+
+// Call this when the document is ready
+document.addEventListener('DOMContentLoaded', initializeTouchEvents);
