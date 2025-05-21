@@ -10,6 +10,9 @@ function detectCollision(dino, obstacle) {
 let touchStartX = 0;
 let touchStartY = 0;
 let isSwiping = false;
+let touchStartTime = 0;
+const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
+const TAP_DURATION = 200; // Maximum duration for a tap in milliseconds
 
 function handleInput(e) {
     if (gameState === 'start') {
@@ -38,25 +41,15 @@ function handleInput(e) {
 }
 
 function handleTouchStart(e) {
-    e.preventDefault(); // Prevent default touch behavior
+    e.preventDefault();
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
     isSwiping = false;
-
-    // Handle game start/restart and jumping
-    if (gameState === 'start') {
-        gameState = 'playing';
-        startGame();
-    } else if (gameState === 'playing' && !isPaused) {
-        dino.jump();
-    } else if (gameState === 'gameover') {
-        resetGame();
-        gameState = 'playing';
-    }
 }
 
 function handleTouchMove(e) {
-    e.preventDefault(); // Prevent default touch behavior
+    e.preventDefault();
     if (!isSwiping) {
         const touchX = e.touches[0].clientX;
         const touchY = e.touches[0].clientY;
@@ -64,7 +57,7 @@ function handleTouchMove(e) {
         const deltaY = touchY - touchStartY;
 
         // If horizontal movement is greater than vertical and significant enough
-        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > SWIPE_THRESHOLD) {
             isSwiping = true;
             if (deltaX > 0 && gameState === 'playing' && !isPaused) {
                 dino.shootLaser();
@@ -74,7 +67,23 @@ function handleTouchMove(e) {
 }
 
 function handleTouchEnd(e) {
-    e.preventDefault(); // Prevent default touch behavior
+    e.preventDefault();
+    const touchEndTime = Date.now();
+    const touchDuration = touchEndTime - touchStartTime;
+
+    // Only handle tap if it wasn't a swipe and the touch duration was short enough
+    if (!isSwiping && touchDuration < TAP_DURATION) {
+        if (gameState === 'start') {
+            gameState = 'playing';
+            startGame();
+        } else if (gameState === 'playing' && !isPaused) {
+            dino.jump();
+        } else if (gameState === 'gameover') {
+            resetGame();
+            gameState = 'playing';
+        }
+    }
+
     isSwiping = false;
 }
 
@@ -153,13 +162,17 @@ function endGame() {
 
 }
 
-// Initialize touch events
+// Initialize touch events with performance optimizations
 function initializeTouchEvents() {
     const canvas = document.getElementById('gameCanvas');
     if (canvas) {
+        // Use passive listeners for move events to improve performance
         canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
         canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
         canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        
+        // Prevent default touch behaviors
+        canvas.addEventListener('touchcancel', (e) => e.preventDefault(), { passive: false });
     }
 }
 
