@@ -13,7 +13,7 @@ let isSwiping = false;
 
 function handleInput(e) {
     if (gameState === 'start') {
-        if (e.key === ' ' || e.type === 'touchstart') {
+        if (e.key === ' ') {
             gameState = 'playing';
             startGame();
         }
@@ -22,7 +22,7 @@ function handleInput(e) {
             togglePause();
         }
         if (!isPaused) {
-            if (e.key === ' ' || e.type === 'touchstart') {
+            if (e.key === ' ') {
                 dino.jump();
             }
             if (e.key === 'ArrowRight') {
@@ -30,7 +30,7 @@ function handleInput(e) {
             }
         }
     } else if (gameState === 'gameover') {
-        if (e.key === ' ' || e.type === 'touchstart') {
+        if (e.key === ' ') {
             resetGame();
             gameState = 'playing';
         }
@@ -41,6 +41,17 @@ function handleTouchStart(e) {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     isSwiping = false;
+
+    // Handle game start/restart and jumping
+    if (gameState === 'start') {
+        gameState = 'playing';
+        startGame();
+    } else if (gameState === 'playing' && !isPaused) {
+        dino.jump();
+    } else if (gameState === 'gameover') {
+        resetGame();
+        gameState = 'playing';
+    }
 }
 
 function handleTouchMove(e) {
@@ -61,9 +72,6 @@ function handleTouchMove(e) {
 }
 
 function handleTouchEnd(e) {
-    if (!isSwiping) {
-        handleInput({ type: 'touchstart' });
-    }
     isSwiping = false;
 }
 
