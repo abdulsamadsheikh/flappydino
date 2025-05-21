@@ -29,6 +29,7 @@ let backgroundSpeed3 = 2.5 / 3;
 
 let gameState = 'start'; 
 let score = 0;
+let isPaused = false;
 
 const BACKGROUND_MUSIC_VOLUME = 0.8; // Background music volume (0.0 to 1.0)
 const COLLISION_SOUNDS_VOLUME = 0.2;  // Collision sounds volume
@@ -83,6 +84,15 @@ shootSounds.forEach(sound => {
 });
 
 let isBackgroundMusicPlaying = false;
+
+let topScores = JSON.parse(localStorage.getItem('topScores')) || [0, 0, 0];
+
+function updateTopScores(newScore) {
+    topScores.push(newScore);
+    topScores.sort((a, b) => b - a);
+    topScores = topScores.slice(0, 3);
+    localStorage.setItem('topScores', JSON.stringify(topScores));
+}
 
 requestAnimationFrame(gameLoop);
 
@@ -142,42 +152,54 @@ function drawBackground() {
     context.drawImage(backgroundLayer3, backgroundLayer3X + canvas.width, 0, canvas.width, canvas.height);
 }
 
+function togglePause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+        backgroundMusic.pause();
+    } else {
+        backgroundMusic.play();
+    }
+}
+
 function gameLoop() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     if (gameState === 'start') {
         drawStartScreen();
     } else if (gameState === 'playing') {
-        updateBackground();
-        drawBackground();
+        if (!isPaused) {
+            updateBackground();
+            drawBackground();
 
-        dino.update();
-        dino.draw();
+            dino.update();
+            dino.draw();
 
-        obstacles.forEach(tree => {
-            tree.update();
-            tree.draw();
-        });
+            obstacles.forEach(tree => {
+                tree.update();
+                tree.draw();
+            });
 
-        meteors.forEach(meteor => {
-            meteor.update();
-            meteor.draw();
-        });
+            meteors.forEach(meteor => {
+                meteor.update();
+                meteor.draw();
+            });
 
-        pterodactyls.forEach(pterodactyl => {
-            pterodactyl.update();
-            pterodactyl.draw();
-        });
+            pterodactyls.forEach(pterodactyl => {
+                pterodactyl.update();
+                pterodactyl.draw();
+            });
 
-        spawnObstacles();
+            spawnObstacles();
+            checkCollisions();
 
-        checkCollisions();
-
-        if (gameState === 'playing') {
-            score++;
+            if (gameState === 'playing') {
+                score++;
+            }
         }
-
         drawScore();
+        if (isPaused) {
+            drawPauseScreen();
+        }
     } else if (gameState === 'gameover') {
         drawGameOverScreen();
     }
@@ -186,20 +208,46 @@ function gameLoop() {
 }
 
 function drawStartScreen() {
-    context.fillStyle = 'black';
-    context.font = '48px Arial';
+    // Draw background
+    updateBackground();
+    drawBackground();
+
+    // Draw title
+    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    context.fillRect(canvas.width / 2 - 200, canvas.height / 2 - 200, 400, 400);
+    
+    context.fillStyle = 'white';
+    context.font = `bold ${Math.min(48, canvas.width / 20)}px Arial`;
     context.textAlign = 'center';
-    context.fillText('Flappy Dino', canvas.width / 2, canvas.height / 2 - 50);
-    context.font = '24px Arial';
-    context.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2);
+    context.textBaseline = 'middle';
+    context.fillText('Flappy Dino', canvas.width / 2, canvas.height / 2 - 120);
+    
+    // Draw top scores
+    context.font = `bold ${Math.min(24, canvas.width / 40)}px Arial`;
+    context.fillText('Top Scores:', canvas.width / 2, canvas.height / 2 - 60);
+    
+    topScores.forEach((score, index) => {
+        context.fillText(`${index + 1}. ${score}`, canvas.width / 2, canvas.height / 2 - 20 + (index * 30));
+    });
+    
+    // Draw instructions
+    context.font = `${Math.min(20, canvas.width / 48)}px Arial`;
+    context.fillText('Press SPACE or tap to start', canvas.width / 2, canvas.height / 2 + 100);
+    context.fillText('SPACE to jump, RIGHT ARROW to shoot', canvas.width / 2, canvas.height / 2 + 130);
+    context.fillText('P to pause', canvas.width / 2, canvas.height / 2 + 160);
 }
 
 function drawGameOverScreen() {
-    context.fillStyle = 'black';
-    context.font = '48px Arial';
+    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    
+    context.fillStyle = 'white';
+    context.font = `bold ${Math.min(48, canvas.width / 20)}px Arial`;
     context.textAlign = 'center';
+    context.textBaseline = 'middle';
     context.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 50);
-    context.font = '24px Arial';
+    
+    context.font = `${Math.min(24, canvas.width / 40)}px Arial`;
     context.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
     context.fillText(`High Score: ${highScore}`, canvas.width / 2, canvas.height / 2 + 50); 
     context.fillText('Press Space to Restart', canvas.width / 2, canvas.height / 2 + 100);
@@ -207,9 +255,24 @@ function drawGameOverScreen() {
 
 function drawScore() {
     context.fillStyle = 'white';               
-    context.font = '36px Arial';               
-    context.textAlign = 'center';             
+    context.font = `bold ${Math.min(36, canvas.width / 27)}px Arial`;               
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';             
     context.fillText(`Score: ${score}`, canvas.width / 2, 50); 
+}
+
+function drawPauseScreen() {
+    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    
+    context.fillStyle = 'white';
+    context.font = `bold ${Math.min(48, canvas.width / 20)}px Arial`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+    
+    context.font = `${Math.min(24, canvas.width / 40)}px Arial`;
+    context.fillText('Press P to Resume', canvas.width / 2, canvas.height / 2 + 50);
 }
 
 function spawnObstacles() {
@@ -243,6 +306,7 @@ function checkCollisions() {
 function endGame() {
     console.log('Game Over!');
     gameState = 'gameover';
+    updateTopScores(score);
 
     if (score > highScore) {
         highScore = score;
@@ -250,6 +314,10 @@ function endGame() {
         console.log('New high score:', highScore);
     }
 
+    // Stop the background music
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+    isBackgroundMusicPlaying = false;
 }
 
 window.addEventListener('keydown', handleInput);

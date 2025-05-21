@@ -8,6 +8,8 @@ body {
     justify-content: center;
     min-height: 100vh;
     background-color: lightblue;
+    overflow: hidden;
+    touch-action: none;
 }
 
 /* Navigation Bar */
@@ -33,21 +35,59 @@ body {
     text-decoration: underline;
 }
 
-/* Game Container to Center the Canvas */
+/* Game Container */
 .game-container {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-grow: 1;
-    margin-top: 60px; /* Space for navbar */
-    height: calc(100vh - 60px); /* Ensures it centers within the viewport */
+    margin-top: 60px;
+    height: calc(100vh - 60px);
+    width: 100%;
 }
 
 /* Game Canvas */
 canvas {
     border: 2px solid black;
-    width: 800px;
-    height: 600px;
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 5px 0;
+    }
+
+    .nav-link {
+        font-size: 16px;
+        margin: 0 10px;
+    }
+
+    canvas {
+        border: none;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .game-container {
+        margin-top: 0;
+        height: 100vh;
+    }
+}
+
+/* Prevent text selection during gameplay */
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Title Card */

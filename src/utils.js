@@ -9,19 +9,24 @@ function detectCollision(dino, obstacle) {
 
 function handleInput(e) {
     if (gameState === 'start') {
-        if (e.key === ' ') {
+        if (e.key === ' ' || e.type === 'touchstart') {
             gameState = 'playing';
             startGame();
         }
     } else if (gameState === 'playing') {
-        if (e.key === ' ') {
-            dino.jump();
+        if (e.key === 'p' || e.key === 'P') {
+            togglePause();
         }
-        if (e.key === 'ArrowRight') {
-            dino.shootLaser();
+        if (!isPaused) {
+            if (e.key === ' ' || e.type === 'touchstart') {
+                dino.jump();
+            }
+            if (e.key === 'ArrowRight' || e.type === 'touchstart' && e.touches[0].clientX > canvas.width / 2) {
+                dino.shootLaser();
+            }
         }
     } else if (gameState === 'gameover') {
-        if (e.key === ' ') {
+        if (e.key === ' ' || e.type === 'touchstart') {
             resetGame();
             gameState = 'playing';
         }
@@ -102,3 +107,6 @@ function endGame() {
     }
 
 }
+
+// Add touch event listeners for mobile
+canvas.addEventListener('touchstart', handleInput, { passive: true });

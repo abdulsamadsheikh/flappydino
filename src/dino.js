@@ -4,18 +4,20 @@ class Dino {
         this.y = canvas.height / 2; 
         this.width = 50;
         this.height = 50;
-        this.gravity = 0.5;
-        this.jumpStrength = -10;
+        this.gravity = 0.3;
+        this.jumpStrength = -8;
         this.velocity = 0;
+        this.maxVelocity = 10;
         this.lasers = [];  
         this.image = new Image(); 
         this.image.src = 'assets/images/dino.png'; 
     }
 
     jump() {
-        this.velocity = this.jumpStrength;
-
-        playRandomSound(jumpSounds, JUMPING_SOUNDS_VOLUME);
+        if (this.velocity > -this.maxVelocity) {
+            this.velocity = this.jumpStrength;
+            playRandomSound(jumpSounds, JUMPING_SOUNDS_VOLUME);
+        }
     }
 
     shootLaser() {
@@ -32,17 +34,21 @@ class Dino {
 
     update() {
         this.velocity += this.gravity;
+        
+        if (this.velocity > this.maxVelocity) {
+            this.velocity = this.maxVelocity;
+        }
+        
         this.y += this.velocity;
     
         if (this.y + this.height > canvas.height) {
             this.y = canvas.height - this.height;
-            this.velocity = 0;
-            endGame(); 
+            endGame(); // Die when hitting the floor
         }
     
         if (this.y < 0) {
-            this.y = 0; 
-            this.velocity = 0; 
+            this.y = 0;
+            this.velocity = 0;
         }
     
         this.lasers.forEach(laser => laser.update());
