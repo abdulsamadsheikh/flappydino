@@ -1,3 +1,6 @@
+const canvas = document.getElementById('gameCanvas');
+const context = canvas.getContext('2d', { alpha: false });
+
 function rectsOverlap(a, b) {
     return (
         a.x < b.x + b.width &&

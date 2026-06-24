@@ -1,6 +1,3 @@
-const canvas = document.getElementById('gameCanvas');
-const context = canvas.getContext('2d', { alpha: false });
-
 function resizeCanvas() {
     canvas.width = Math.max(1, window.innerWidth);
     canvas.height = Math.max(1, window.innerHeight);
@@ -35,6 +32,8 @@ function makeAudio(src, volume, loop = false) {
     return a;
 }
 
+const MUSIC_VOLUME_LEVELS = [0, 0.25, 0.5, 0.75, 1];
+
 const backgroundMusic = makeAudio('assets/sounds/background_music.mp3', VOLUME.music, true);
 
 const soundPools = {
@@ -55,6 +54,18 @@ for (const key in soundPools) {
 }
 
 let isMuted = localStorage.getItem('muted') === '1';
+let musicVolume = parseFloat(localStorage.getItem('musicVolume'));
+if (!Number.isFinite(musicVolume)) musicVolume = VOLUME.music;
+
+function applyMusicVolume() {
+    backgroundMusic.volume = musicVolume;
+    if (isMuted || musicVolume === 0) {
+        backgroundMusic.pause();
+    } else if (Game && Game.state === 'playing' && !Game.isPaused) {
+        backgroundMusic.muted = false;
+        backgroundMusic.play().catch(() => {});
+    }
+}
 
 function applyMute() {
     backgroundMusic.muted = isMuted;
@@ -65,6 +76,7 @@ function applyMute() {
     }
 }
 applyMute();
+applyMusicVolume();
 
 const Game = {
     state: 'loading',
@@ -100,7 +112,8 @@ const Game = {
     },
 
     startMusic() {
-        if (isMuted) return;
+        if (isMuted || musicVolume === 0) return;
+        backgroundMusic.volume = musicVolume;
         backgroundMusic.muted = false;
         backgroundMusic.play().catch(() => {});
     },
@@ -146,19 +159,28 @@ const Game = {
         if (this.state !== 'playing') return;
         this.isPaused = !this.isPaused;
         if (this.isPaused) backgroundMusic.pause();
-        else if (!isMuted) backgroundMusic.play().catch(() => {});
+        else if (!isMuted && musicVolume > 0) backgroundMusic.play().catch(() => {});
     },
 
     toggleMute() {
         isMuted = !isMuted;
         localStorage.setItem('muted', isMuted ? '1' : '0');
         applyMute();
-        if (!isMuted && this.state === 'playing' && !this.isPaused) {
+        if (!isMuted && musicVolume > 0 && this.state === 'playing' && !this.isPaused) {
             backgroundMusic.play().catch(() => {});
         } else {
             backgroundMusic.pause();
         }
         updateMuteButton();
+    },
+
+    cycleMusicVolume() {
+        const idx = MUSIC_VOLUME_LEVELS.indexOf(musicVolume);
+        const next = idx === -1 ? 0 : (idx + 1) % MUSIC_VOLUME_LEVELS.length;
+        musicVolume = MUSIC_VOLUME_LEVELS[next];
+        localStorage.setItem('musicVolume', String(musicVolume));
+        applyMusicVolume();
+        updateMusicVolumeButton();
     },
 };
 
@@ -266,7 +288,7 @@ function drawStartScreen() {
     drawTextCentered(isTouch ? 'TRYKK for å starte' : 'MELLOMROM for å starte',
         cx, y, clamp(canvas.width / 30, 16, 22), '#fff');
     y += 32;
-    drawTextCentered(isTouch ? 'Trykk = hopp, sveip høyre = skyt' : 'SPACE = hopp · → = skyt · P = pause',
+    drawTextCentered(isTouch ? 'Trykk = hopp, sveip høyre = skyt' : 'SPACE = hopp · → = skyt · P = pause · M = demp',
         cx, y, clamp(canvas.width / 38, 13, 17), 'rgba(255,255,255,0.75)');
 
     const blink = 0.6 + Math.sin(Game.pulse * 4) * 0.4;
@@ -494,12 +516,27 @@ function updateMuteButton() {
     if (!btn) return;
     btn.innerHTML = isMuted ? '&#x1F507;' : '&#x1F50A;';
     btn.classList.toggle('muted', isMuted);
-    btn.setAttribute('aria-label', isMuted ? 'Skru på lyd' : 'Demp lyd');
+    btn.setAttribute('aria-label', isMuted ? 'Skru på lyd (M)' : 'Demp lyd (M)');
+}
+
+function updateMusicVolumeButton() {
+    const btn = document.getElementById('musicVolumeBtn');
+    if (!btn) return;
+    const pct = Math.round(musicVolume * 100);
+    btn.innerHTML = musicVolume === 0 ? '&#x266A;' : '&#x266B;';
+    btn.classList.toggle('music-off', musicVolume === 0);
+    btn.style.opacity = musicVolume === 0 ? '' : String(0.35 + musicVolume * 0.65);
+    btn.setAttribute('aria-label', musicVolume === 0 ? 'Skru på musikk' : `Musikkvolum ${pct}%`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const musicVolumeBtn = document.getElementById('musicVolumeBtn');
     const muteBtn = document.getElementById('muteBtn');
     const pauseBtn = document.getElementById('pauseBtn');
+    if (musicVolumeBtn) {
+        updateMusicVolumeButton();
+        musicVolumeBtn.addEventListener('click', () => Game.cycleMusicVolume());
+    }
     if (muteBtn) {
         updateMuteButton();
         muteBtn.addEventListener('click', () => Game.toggleMute());
