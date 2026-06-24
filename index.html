@@ -2,26 +2,47 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1020">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://defendly.networkkosova.com/v1/defendly-tracker.js" data-id="yahood.no" data-instance-id="df_zone_971103f2"></script>
     <title>Flappy Dino</title>
 
-    <!-- Favicon and Touch Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon_io/favicon-16x16.png">
     <link rel="manifest" href="assets/images/favicon_io/site.webmanifest">
     <link rel="shortcut icon" href="assets/images/favicon_io/favicon.ico">
 
-    <!-- Stylesheet -->
+    <link rel="preload" as="image" href="assets/images/background_layer_1.png">
+    <link rel="preload" as="image" href="assets/images/background_layer_2.png">
+    <link rel="preload" as="image" href="assets/images/background_layer_3.png">
+    <link rel="preload" as="image" href="assets/images/dino.png">
+    <link rel="preload" as="image" href="assets/images/tree.png">
+    <link rel="preload" as="image" href="assets/images/meteor.png">
+    <link rel="preload" as="image" href="assets/images/pterodactyl.png">
+
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
+    <canvas id="gameCanvas" aria-label="Flappy Dino spillbrett"></canvas>
 
-    <nav class="navbar">
-        <a href="about.html" class="nav-link">Om Oss</a>
-    </nav>
+    <div class="hud" aria-hidden="false">
+        <a href="about.html" class="hud-btn" id="aboutBtn" aria-label="Om oss">i</a>
+        <button type="button" class="hud-btn" id="muteBtn" aria-label="Demp lyd">&#x1F50A;</button>
+        <button type="button" class="hud-btn" id="pauseBtn" aria-label="Pause">II</button>
+    </div>
 
-    <canvas id="gameCanvas"></canvas>
+    <div id="loadingScreen" class="loading">
+        <div class="loading-inner">
+            <div class="loading-title">Flappy Dino</div>
+            <div class="loading-bar"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+            <div class="loading-pct" id="loadingPct">0%</div>
+        </div>
+    </div>
 
     <script src="src/utils.js"></script>
     <script src="src/dino.js"></script>
