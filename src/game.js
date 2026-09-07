@@ -53,8 +53,8 @@ for (const key in soundPools) {
     }
 }
 
-let isMuted = localStorage.getItem('muted') === '1';
-let musicVolume = parseFloat(localStorage.getItem('musicVolume'));
+let isMuted = storageGet('muted') === '1';
+let musicVolume = parseFloat(storageGet('musicVolume'));
 if (!Number.isFinite(musicVolume)) musicVolume = VOLUME.music;
 
 function applyMusicVolume() {
@@ -75,13 +75,11 @@ function applyMute() {
         }
     }
 }
-applyMute();
-applyMusicVolume();
 
 const Game = {
     state: 'loading',
     score: 0,
-    highScore: Number(localStorage.getItem('highScore')) || 0,
+    highScore: Number(storageGet('highScore')) || 0,
     topScores: parseTopScores(),
     dino: null,
     obstacles: [],
@@ -150,7 +148,7 @@ const Game = {
         updateTopScores(this, finalScore);
         if (finalScore > this.highScore) {
             this.highScore = finalScore;
-            localStorage.setItem('highScore', String(this.highScore));
+            storageSet('highScore', String(this.highScore));
         }
         backgroundMusic.pause();
     },
@@ -164,7 +162,7 @@ const Game = {
 
     toggleMute() {
         isMuted = !isMuted;
-        localStorage.setItem('muted', isMuted ? '1' : '0');
+        storageSet('muted', isMuted ? '1' : '0');
         applyMute();
         if (!isMuted && musicVolume > 0 && this.state === 'playing' && !this.isPaused) {
             backgroundMusic.play().catch(() => {});
@@ -178,15 +176,19 @@ const Game = {
         const idx = MUSIC_VOLUME_LEVELS.indexOf(musicVolume);
         const next = idx === -1 ? 0 : (idx + 1) % MUSIC_VOLUME_LEVELS.length;
         musicVolume = MUSIC_VOLUME_LEVELS[next];
-        localStorage.setItem('musicVolume', String(musicVolume));
+        storageSet('musicVolume', String(musicVolume));
         applyMusicVolume();
         updateMusicVolumeButton();
     },
 };
 
+// Must run after Game is defined: applyMusicVolume() reads Game.state.
+applyMute();
+applyMusicVolume();
+
 function parseTopScores() {
     try {
-        const raw = JSON.parse(localStorage.getItem('topScores'));
+        const raw = JSON.parse(storageGet('topScores'));
         if (Array.isArray(raw)) return raw.map(Number).filter(n => Number.isFinite(n)).slice(0, 3);
     } catch (_) {}
     return [];
@@ -196,7 +198,7 @@ function updateTopScores(g, newScore) {
     g.topScores.push(newScore);
     g.topScores.sort((a, b) => b - a);
     g.topScores = g.topScores.slice(0, 3);
-    localStorage.setItem('topScores', JSON.stringify(g.topScores));
+    storageSet('topScores', JSON.stringify(g.topScores));
 }
 
 function drawBackgroundLayer(layer, dt) {
@@ -546,11 +548,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// An image that neither loads nor errors (stalled request, flaky connection)
+// would otherwise hold the loading screen forever. The timeout guarantees the
+// game starts; anything missing falls back to its coloured placeholder box.
+const ASSET_TIMEOUT_MS = 8000;
+
 function loadAsset(img) {
     return new Promise(res => {
         if (img.complete && img.naturalWidth > 0) return res();
-        img.addEventListener('load', res, { once: true });
-        img.addEventListener('error', res, { once: true });
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            res();
+        };
+        const timer = setTimeout(finish, ASSET_TIMEOUT_MS);
+        img.addEventListener('load', finish, { once: true });
+        img.addEventListener('error', finish, { once: true });
     });
 }
 
@@ -564,18 +579,19 @@ async function preloadAll(onProgress) {
     const tick = () => { loaded++; if (onProgress) onProgress(loaded / total); };
     const imgPromises = images.map(img => loadAsset(img).then(tick));
 
-    const laserPromise = (async () => {
-        for (let i = 1; i <= LASER_COUNT; i++) {
-            const img = new Image();
-            const name = i < 10 ? `0${i}.png` : `${i}.png`;
-            img.src = `assets/images/lasers/${name}`;
-            laserImages.push(img);
-            await loadAsset(img);
-            tick();
-        }
-    })();
+    // These used to be awaited one at a time: 66 sequential round trips.
+    // Starting them together turns minutes of loading into seconds on a
+    // slow connection.
+    const laserPromises = [];
+    for (let i = 1; i <= LASER_COUNT; i++) {
+        const img = new Image();
+        const name = i < 10 ? `0${i}.png` : `${i}.png`;
+        img.src = `assets/images/lasers/${name}`;
+        laserImages.push(img);
+        laserPromises.push(loadAsset(img).then(tick));
+    }
 
-    await Promise.all([...imgPromises, laserPromise]);
+    await Promise.all([...imgPromises, ...laserPromises]);
 }
 
 function startUp() {
@@ -583,17 +599,20 @@ function startUp() {
     const fill = document.getElementById('loadingBarFill');
     const pct = document.getElementById('loadingPct');
 
-    preloadAll((p) => {
-        const v = Math.round(p * 100);
-        if (fill) fill.style.width = v + '%';
-        if (pct) pct.textContent = v + '%';
-    }).then(() => {
+    const showGame = () => {
+        if (Game.state !== 'loading') return;
         Game.state = 'start';
         if (loading) {
             loading.classList.add('hidden');
             setTimeout(() => loading.remove(), 400);
         }
-    });
+    };
+
+    preloadAll((p) => {
+        const v = Math.round(p * 100);
+        if (fill) fill.style.width = v + '%';
+        if (pct) pct.textContent = v + '%';
+    }).then(showGame).catch(showGame);
 
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);

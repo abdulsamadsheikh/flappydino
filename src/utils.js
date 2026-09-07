@@ -60,3 +60,21 @@ function detectDinoHit(dino, obstacles, meteors, pterodactyls) {
     }
     return false;
 }
+
+// Browsers that block site data (Safari with "block all cookies", some
+// embedded webviews) throw on merely reading localStorage. Without these
+// wrappers such a throw would abort all of game.js, and the game would
+// never get past the loading screen.
+function storageGet(key) {
+    try {
+        return localStorage.getItem(key);
+    } catch (_) {
+        return null;
+    }
+}
+
+function storageSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch (_) {}
+}
